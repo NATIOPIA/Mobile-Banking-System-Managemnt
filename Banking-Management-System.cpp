@@ -124,6 +124,40 @@ void depositIntoAccount() {
     }
 }
 
+void searchAccount() {
+    int accNum;
+    bool accountFound = false;
+    Account tempAccount;
+    ifstream readAccounts(FILE_NAME);
+
+    cout << "Enter account number to search: ";
+    cin >> accNum;
+
+    while (readAccounts >> ws && getline(readAccounts, tempAccount.Fname, ',') &&
+           readAccounts >> tempAccount.phNum >> ws && 
+           readAccounts.ignore(1) && // Ignore the comma
+           readAccounts >> tempAccount.accNum >> ws && 
+           readAccounts.ignore(1) && // Ignore the comma
+           readAccounts >> tempAccount.balance) {
+        
+        if (tempAccount.accNum == accNum) {
+            accountFound = true;
+            cout << "\n--- Account Found ---\n";
+            cout << "Full Name: " << tempAccount.Fname << endl;
+            cout << "Phone Number: " << tempAccount.phNum << endl;
+            cout << "Account Number: " << tempAccount.accNum << endl;
+            cout << "Balance: " << tempAccount.balance << endl;
+            break;
+        }
+    }
+
+    readAccounts.close();
+
+    if (!accountFound) {
+        cout << "Account number not found." << endl;
+    }
+}
+
 int main() {
     int choice;
     do {
@@ -141,7 +175,7 @@ int main() {
                 depositIntoAccount(); 
                 break;
             case 4:
-                // Code to search Account would go here
+                searchAccount();
                 break;
             case 5:
                 // Code to edit Account would go here
