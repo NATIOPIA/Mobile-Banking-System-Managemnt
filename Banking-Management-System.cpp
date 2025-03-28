@@ -19,8 +19,8 @@ void showmenu() {
     cout << "1. Create new account \n";
     cout << "2. Display accounts\n";
     cout << "3. Deposit into account\n";
-    cout << "4. Search Account\n";
-    cout << "5. Edit Account\n";
+    cout << "4. Withdraw from account\n";
+    cout << "5. Search Account\n";
     cout << "6. Delete Account\n";
     cout << "7. Exit\n";
     cout << "Enter your choice: ";
@@ -77,7 +77,7 @@ void displayAccounts() {
     cout << "\n--- List of Accounts ---\n";
     string line;
     while (getline(readAccounts, line)) {
-        cout << line << endl;)
+        cout << line << endl;
     }
     readAccounts.close();
 }
@@ -119,6 +119,60 @@ void depositIntoAccount() {
 
     if (accountFound) {
         cout << "\n--- Deposit successful! ---\n" << endl;
+    } else {
+        cout << "Account number not found." << endl;
+    }
+}
+
+void withdrawFromAccount() {
+    int accNum;
+    double withdrawAmount;
+    bool accountFound = false;
+    Account tempAccount;
+    ifstream readAccounts(FILE_NAME);
+    ofstream tempFile("temp.xlsx"); 
+
+    cout << "Enter account number to withdraw from: ";
+    cin >> accNum;
+
+    while (readAccounts >> ws && getline(readAccounts, tempAccount.Fname, ',') &&
+           readAccounts >> tempAccount.phNum >> ws && 
+           readAccounts.ignore(1) && // Ignore the comma
+           readAccounts >> tempAccount.accNum >> ws && 
+           readAccounts.ignore(1) && // Ignore the comma
+           readAccounts >> tempAccount.balance) {
+        
+        if (tempAccount.accNum == accNum) {
+            accountFound = true;
+            cout << "Current balance: " << tempAccount.balance << endl;
+            cout << "Enter amount to withdraw: ";
+            cin >> withdrawAmount;
+
+            // Validate withdraw amount
+            if (withdrawAmount <= 0) {
+                cout << "Invalid withdraw amount. Please enter a positive value." << endl;
+                return;
+            }
+
+            if (withdrawAmount > tempAccount.balance) {
+                cout << "Insufficient balance!" << endl;
+                return;
+            }
+
+            tempAccount.balance -= withdrawAmount; // Update balance
+            cout << "New balance: " << tempAccount.balance << endl;
+        }
+        tempFile << tempAccount.Fname << " , " << tempAccount.phNum << " , " << tempAccount.accNum << " , " << tempAccount.balance << endl;
+    }
+
+    readAccounts.close();
+    tempFile.close();
+
+    remove(FILE_NAME.c_str());
+    rename("temp.xlsx", FILE_NAME.c_str());
+
+    if (accountFound) {
+        cout << "\n--- Withdrawal successful! ---\n" << endl;
     } else {
         cout << "Account number not found." << endl;
     }
@@ -175,10 +229,10 @@ int main() {
                 depositIntoAccount(); 
                 break;
             case 4:
-                searchAccount();
+                withdrawFromAccount();
                 break;
             case 5:
-                // Code to edit Account would go here
+                searchAccount();
                 break;
             case 6:
                 // Code to delete Account would go here
